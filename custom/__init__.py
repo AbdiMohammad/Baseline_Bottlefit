@@ -1,1 +1,1 @@
-from . import model
+from . import (model, vgg, custom_vgg)
