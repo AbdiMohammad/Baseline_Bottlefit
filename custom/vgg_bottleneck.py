@@ -131,5 +131,5 @@ def custom_cifar10_vgg19(bottleneck_channel=12, bottleneck_idx=7, bottleneck_ver
         decompressor = get_bottleneck_processor(decompressor['name'], **decompressor['params'])
 
     bottleneck = Bottleneck4VGG19(bottleneck_channel, bottleneck_idx, bottleneck_ver, compressor, decompressor)
-    org_model = custom.vgg.vgg19_bn(**kwargs)
+    org_model = custom.vgg_cifar10.vgg19_bn(**kwargs)
     return CustomVGG(bottleneck, short_module_names, org_model)

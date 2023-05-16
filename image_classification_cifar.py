@@ -47,7 +47,7 @@ def load_model(model_config, device, distributed):
         repo_or_dir = model_config.get('repo_or_dir', None)
         model = get_model(model_config['name'], repo_or_dir, **model_config['params'])
     else:
-        model = custom.vgg.vgg19_bn(**model_config['params'])
+        model = custom.vgg_cifar10.vgg19_bn(**model_config['params'])
 
     ckpt_file_path = model_config['ckpt']
     load_ckpt(ckpt_file_path, model=model, strict=True)

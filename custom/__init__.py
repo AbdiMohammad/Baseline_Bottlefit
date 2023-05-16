@@ -1,1 +1,1 @@
-from . import (model, vgg, custom_vgg)
+from . import (model, vgg_bottleneck, vgg_cifar10)
