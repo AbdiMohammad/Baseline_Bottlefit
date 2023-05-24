@@ -167,8 +167,8 @@ def main(args):
     cudnn.benchmark = True
     set_seed(args.seed)
     config = yaml_util.load_yaml_file(os.path.expanduser(args.config))
-    # config['teacher_model']['ckpt'] = config['teacher_model']['ckpt'].replace('/home/mohammad/research/dynamic-nn/repo/SNR-Adaptive-Bottlefit/', '/home/admin/MAbdi/')
-    # config['student_model']['ckpt'] = config['student_model']['ckpt'].replace('/home/mohammad/research/dynamic-nn/repo/SNR-Adaptive-Bottlefit/', '/home/admin/MAbdi/')
+    # config['models']['teacher_model']['ckpt'] = config['models']['teacher_model']['ckpt'].replace('/home/mohammad/research/dynamic-nn/repo/SNR-Adaptive-Bottlefit/', '/home/admin/MAbdi/')
+    # config['models']['student_model']['ckpt'] = config['models']['student_model']['ckpt'].replace('/home/mohammad/research/dynamic-nn/repo/SNR-Adaptive-Bottlefit/', '/home/admin/MAbdi/')
 
     dataset_directory = "/media/mohammad/Data/dataset/radioml2018/2018.01/"
     # dataset_directory = "/home/admin/dataset/radioml2018/2018.01/"
