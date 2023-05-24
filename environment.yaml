@@ -1,4 +1,4 @@
-name: sc2-benchmark
+name: mabdi-sc2-benchmark
 channels:
   - conda-forge
   - defaults
@@ -59,4 +59,4 @@ dependencies:
     - torchdistill==0.3.1
     - torchvision==0.11.1
     - typing-extensions==4.0.0
-prefix: /home/mohammad/anaconda3/envs/sc2-benchmark
+prefix: /opt/anaconda3/envs/mabdi-sc2-benchmark
