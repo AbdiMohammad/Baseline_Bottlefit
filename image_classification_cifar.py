@@ -39,6 +39,7 @@ def get_argparser():
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
     parser.add_argument('-adjust_lr', action='store_true',
                         help='multiply learning rate by number of distributed processes (world_size)')
+    parser.add_argument('--bn_size', type=int, default=3, help='number of channels in the bottleneck')
     return parser
 
 
@@ -157,6 +158,8 @@ def main(args):
     # config['datasets']['ilsvrc2012']['root'] = config['datasets']['ilsvrc2012']['root'].replace('~', '/media/mohammad/Data')
     # config['datasets']['ilsvrc2012']['splits']['train']['params']['root'] = config['datasets']['ilsvrc2012']['splits']['train']['params']['root'].replace('~', '/media/mohammad/Data')
     # config['datasets']['ilsvrc2012']['splits']['val']['params']['root'] = config['datasets']['ilsvrc2012']['splits']['val']['params']['root'].replace('~', '/media/mohammad/Data')
+    config['models']['student_model']['ckpt'] = config['models']['student_model']['ckpt'].replace(str(config['models']['student_model']['params']['bottleneck_channel']), str(args.bn_size))
+    config['models']['student_model']['params']['bottleneck_channel'] = args.bn_size
     device = torch.device(args.device)
     dataset_dict = util.get_all_datasets(config['datasets'])
     models_config = config['models']
