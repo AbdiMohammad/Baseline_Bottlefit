@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 
 @register_model_class
-class Bottleneck4VGG19(BottleneckBase):
+class Bottleneck4VGG(BottleneckBase):
     def __init__(self, bottleneck_channel=12, bottleneck_idx=7, bottleneck_ver='2', compressor=None, decompressor=None):
         if bottleneck_ver == '1':
             modules = [
@@ -55,24 +55,46 @@ class Bottleneck4VGG19(BottleneckBase):
                 nn.Conv2d(512, 512, kernel_size=2, stride=1, bias=False),
                 nn.AvgPool2d(kernel_size=2, stride=1)
             ]
-        elif bottleneck_ver == 'cifar10':
+        elif bottleneck_ver == 'vgg11_cifar10':
+            modules = [
+                nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(64),
+                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
+                nn.Conv2d(256, bottleneck_channel, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(bottleneck_channel),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(bottleneck_channel, 512, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(512)
+            ]
+        elif bottleneck_ver == 'vgg19_cifar10':
             modules = [
                 nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(64),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(64, bottleneck_channel, kernel_size=3, stride=1, padding=1),
+                nn.Conv2d(64, 64, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(64),
+                nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.ReLU(inplace=True),
+                nn.Conv2d(128, 128, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(128),
+                nn.Conv2d(128, bottleneck_channel, kernel_size=3, stride=1, padding=1),
                 nn.BatchNorm2d(bottleneck_channel),
-                nn.Conv2d(bottleneck_channel, 512, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
+                nn.Conv2d(bottleneck_channel, 256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(512),
+                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
                 nn.ReLU(inplace=True),
-                nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1),
-                nn.BatchNorm2d(512)
+                nn.Conv2d(256, 256, kernel_size=3, stride=1, padding=1),
+                nn.BatchNorm2d(256),
             ]
         else:
             modules = [
@@ -119,7 +141,7 @@ class CustomVGG(nn.Sequential):
         super().__init__(module_dict)
 
 @register_model_func
-def custom_cifar10_vgg19(bottleneck_channel=12, bottleneck_idx=7, bottleneck_ver='2', compressor=None, decompressor=None,
+def custom_vgg11_cifar10(bottleneck_channel=12, bottleneck_idx=7, bottleneck_ver='vgg11_cifar10', compressor=None, decompressor=None,
                      short_module_names=None, **kwargs):
     if short_module_names is None:
         short_module_names = ['block4', 'pool0', 'pool1', 'pool2', 'pool3', 'pool4', 'classifier']
@@ -130,6 +152,22 @@ def custom_cifar10_vgg19(bottleneck_channel=12, bottleneck_idx=7, bottleneck_ver
     if decompressor is not None:
         decompressor = get_bottleneck_processor(decompressor['name'], **decompressor['params'])
 
-    bottleneck = Bottleneck4VGG19(bottleneck_channel, bottleneck_idx, bottleneck_ver, compressor, decompressor)
+    bottleneck = Bottleneck4VGG(bottleneck_channel, bottleneck_idx, bottleneck_ver, compressor, decompressor)
+    org_model = custom.vgg_cifar10.vgg11_bn(**kwargs)
+    return CustomVGG(bottleneck, short_module_names, org_model)
+
+@register_model_func
+def custom_vgg19_cifar10(bottleneck_channel=13, bottleneck_idx=7, bottleneck_ver='vgg19_cifar10', compressor=None, decompressor=None,
+                     short_module_names=None, **kwargs):
+    if short_module_names is None:
+        short_module_names = ['block3', 'block4', 'pool0', 'pool1', 'pool2', 'pool3', 'pool4', 'classifier']
+
+    if compressor is not None:
+        compressor = get_bottleneck_processor(compressor['name'], **compressor['params'])
+
+    if decompressor is not None:
+        decompressor = get_bottleneck_processor(decompressor['name'], **decompressor['params'])
+
+    bottleneck = Bottleneck4VGG(bottleneck_channel, bottleneck_idx, bottleneck_ver, compressor, decompressor)
     org_model = custom.vgg_cifar10.vgg19_bn(**kwargs)
     return CustomVGG(bottleneck, short_module_names, org_model)
