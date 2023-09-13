@@ -151,12 +151,19 @@ def main(args):
     cudnn.benchmark = True
     set_seed(args.seed)
     config = yaml_util.load_yaml_file(os.path.expanduser(args.config))
+    # config['datasets']['ilsvrc2012']['root'] = config['datasets']['ilsvrc2012']['root'].replace('~', '/media/mohammad/Data')
+    # config['datasets']['ilsvrc2012']['splits']['train']['params']['root'] = config['datasets']['ilsvrc2012']['splits']['train']['params']['root'].replace('~', '/media/mohammad/Data')
+    # config['datasets']['ilsvrc2012']['splits']['val']['params']['root'] = config['datasets']['ilsvrc2012']['splits']['val']['params']['root'].replace('~', '/media/mohammad/Data')
     device = torch.device(args.device)
     dataset_dict = util.get_all_datasets(config['datasets'])
     models_config = config['models']
     teacher_model_config = models_config.get('teacher_model', None)
     teacher_model =\
         load_model(teacher_model_config, device, distributed) if teacher_model_config is not None else None
+    
+    if 'vgg' in teacher_model_config['name']:
+        teacher_model = custom.vgg_bottleneck.VGG_Layered(teacher_model, [2, 2, 3, 3, 3])
+
     student_model_config =\
         models_config['student_model'] if 'student_model' in models_config else models_config['model']
     ckpt_file_path = student_model_config['ckpt']
